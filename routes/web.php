@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\TaskController;
+use App\Http\Controllers\UserController;
 use Carbon\Factory;
 //use Illuminate\Container\Attributes\DB;
 use Illuminate\Support\Facades\DB;
@@ -86,44 +88,58 @@ Route::post(uri:'/about',action:function(): Factory|View{
 //      return redirect()->to('task');
 // });
 
-//view task
-Route::get('task', function() {
-    $tasks =    DB::table('task')->get();
-    return view('task', compact('tasks')); // تمرير tasks إلى الـ view
-});
+// //view task
+// Route::get('task', [TaskController::class,'index']);
+
+// // add a new task
+// Route::post('create',[TaskController::class,'create']);
+
+// // حذف مهمة
+// Route::post('delete/{id}',[TaskController::class,'destroy']);
+
+// // Edit task
+// Route::get('edit/{id}', [TaskController::class,'edit']);
+
+// // update task
+// Route::post('update',[TaskController::class,'update']);
+
+
+
+// view tasks
+Route::get('task', [TaskController::class, 'index'])->name('task.index');
 
 // add a new task
-Route::post('create', function (Request $request) {
-    $task_name = $request->input('name');
-    DB::table('task')->insert(['name' => $task_name]);
-    return redirect()->back(); // إعادة التوجيه إلى الصفحة السابقة
+Route::post('create', [TaskController::class, 'create'])->name('task.create');
+
+// delete a task
+Route::post('delete/{id}', [TaskController::class, 'destroy'])->name('task.delete');
+
+// edit a task
+Route::get('edit/{id}', [TaskController::class, 'edit'])->name('task.edit');
+
+// update a task
+Route::post('update', [TaskController::class, 'update'])->name('task.update');
+
+
+// View A user menu
+Route::get('/users', [UserController::class, 'index'])->name('users.index');
+
+// Add a new user
+Route::post('/users', [UserController::class, 'create'])->name('users.create');
+
+// delete a user
+Route::delete('/users/{id}', [UserController::class, 'destroy'])->name('users.destroy');
+
+// Edit a user data
+Route::get('/users/{id}/edit', [UserController::class, 'edit'])->name('users.edit');
+
+//Update a user data
+Route::put('/users/{id}', [UserController::class, 'update'])->name('users.update');
+
+
+
+Route::get('app',action:function(){
+     return view(view:'layouts.app');
 });
-
-// حذف مهمة
-Route::post('delete/{id}', function ($id) {
-    DB::table('task')->where('id', $id)->delete();
-    return redirect()->back(); // إعادة التوجيه بعد الحذف
-});
-
-// Edit task
-Route::get('edit/{id}', function ($id) {
-    $task = DB::table('task')->where('id', $id)->first(); // جلب المهمة بواسطة الـ id
-    if ($task) {
-        $tasks = DB::table('task')->get(); // جلب جميع المهام
-        return view('task', compact('task', 'tasks')); // تمرير البيانات إلى الـ view
-    }
-    return redirect()->back()->with('error', 'Task not found');
-});
-
-// update task
-Route::post('update', function (Request $request) {
-    $id = $request->input('id');
-    $task_name = $request->input('name');
-
-    DB::table('task')->where('id', $id)->update(['name' => $task_name]);
-
-    return redirect()->to('task'); // إعادة التوجيه إلى صفحة المهام بعد التحديث
-});
-
 ?>
 
