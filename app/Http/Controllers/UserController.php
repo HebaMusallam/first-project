@@ -11,6 +11,7 @@ class UserController extends Controller
     // View all the users
     public function index()
     {
+        // $users =    DB::table('users')->get();
         $users = User::all();
         return view('users', compact('users'));
     }
@@ -23,6 +24,7 @@ class UserController extends Controller
             'email' => 'required|email|unique:users',
             'password' => 'required|string|min:8',
         ]);
+        //DB::table('users')->insert(['name' => $user_name],['email' => $user_email],['password' => $user_password]);
 
         User::create([
             'name'  => $request->name,
@@ -36,6 +38,8 @@ class UserController extends Controller
     //View user edit form
     public function edit($id)
     {
+        // $user = DB::table('users')->where('id', $id)->first();
+        // $users = DB::table('users')->get();
         $user  = User::findOrFail($id);
         $users = User::all(); // to view all the user in the table
         return view('edit', compact('user'));
@@ -63,6 +67,7 @@ public function update(Request $request, $id)
     if ($request->filled('password')) {
         $data['password'] = Hash::make($request->password);  //update a password
     }
+// DB::table('users')->where('id', $id)->update(['name' => $user_name],['email' => $user_email],['password' => $user_password]);
 
     $user->update($data);  // update the data
 
@@ -72,6 +77,7 @@ public function update(Request $request, $id)
     // delete a user
     public function destroy($id)
     {
+        // DB::table('users')->where('id', $id)->delete();
         $user = User::findOrFail($id);
         $user->delete();
 
