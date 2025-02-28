@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\User;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Hash;
 
 class UserController extends Controller
@@ -11,8 +12,8 @@ class UserController extends Controller
     // View all the users
     public function index()
     {
-        // $users =    DB::table('users')->get();
-        $users = User::all();
+        $users =    DB::table('users')->get();
+        // $users = User::all();
         return view('users', compact('users'));
     }
 
@@ -24,13 +25,17 @@ class UserController extends Controller
             'email' => 'required|email|unique:users',
             'password' => 'required|string|min:8',
         ]);
-        //DB::table('users')->insert(['name' => $user_name],['email' => $user_email],['password' => $user_password]);
-
-        User::create([
-            'name'  => $request->name,
+        DB::table('users')->insert([
+            'name' => $request->name,
             'email' => $request->email,
-            'password' => Hash::make($request->password), // Encrypt a password
+            'password' => bcrypt($request->password),
         ]);
+
+        // User::create([
+        //     'name'  => $request->name,
+        //     'email' => $request->email,
+        //     'password' => Hash::make($request->password), // Encrypt a password
+        // ]);
 
         return redirect()->route('users.index')->with('success', 'user add successfuly');
     }
@@ -38,10 +43,10 @@ class UserController extends Controller
     //View user edit form
     public function edit($id)
     {
-        // $user = DB::table('users')->where('id', $id)->first();
-        // $users = DB::table('users')->get();
-        $user  = User::findOrFail($id);
-        $users = User::all(); // to view all the user in the table
+        $user = DB::table('users')->where('id', $id)->first();
+        $users = DB::table('users')->get();
+        // $user  = User::findOrFail($id);
+        // $users = User::all(); // to view all the user in the table
         return view('edit', compact('user'));
     }
 
@@ -55,21 +60,21 @@ public function update(Request $request, $id)
         'password' => 'nullable|string|min:8',  // Validate password only if provided
     ]);
 
-    $user = User::findOrFail($id);  //
+    // $user = User::findOrFail($id);  //
 
     // update the user data
-    $data = [
-        'name'  => $request->name,
-        'email' => $request->email,
-    ];
+    // $data = [
+    //     'name'  => $request->name,
+    //     'email' => $request->email,
+    // ];
 
     // if a password is a new
-    if ($request->filled('password')) {
-        $data['password'] = Hash::make($request->password);  //update a password
-    }
-// DB::table('users')->where('id', $id)->update(['name' => $user_name],['email' => $user_email],['password' => $user_password]);
+    // if ($request->filled('password')) {
+    //     $data['password'] = Hash::make($request->password);  //update a password
+    // }
+DB::table('users')->where('id', $id)->update(['name' =>$request->name],['email' => $request->email],['password' => $request->password]);
 
-    $user->update($data);  // update the data
+    // $user->update($data);  // update the data
 
     return redirect()->route('users.index')->with('success', 'The data of the user was updated');
 }
@@ -77,9 +82,9 @@ public function update(Request $request, $id)
     // delete a user
     public function destroy($id)
     {
-        // DB::table('users')->where('id', $id)->delete();
-        $user = User::findOrFail($id);
-        $user->delete();
+        DB::table('users')->where('id', $id)->delete();
+        // $user = User::findOrFail($id);
+        // $user->delete();
 
         return redirect()->route('users.index')->with('success', 'the user was deleted successfuly');
     }
