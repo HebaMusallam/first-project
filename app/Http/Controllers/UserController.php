@@ -26,11 +26,10 @@ class UserController extends Controller
             'password' => 'required|string|min:8',
         ]);
         DB::table('users')->insert([
-            'name' => $request->name,
+            'name'=>$request->name,
             'email' => $request->email,
-            'password' => bcrypt($request->password),
+            'password' => bcrypt($request->password)
         ]);
-
         // User::create([
         //     'name'  => $request->name,
         //     'email' => $request->email,
